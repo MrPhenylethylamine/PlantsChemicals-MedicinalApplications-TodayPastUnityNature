@@ -8,6 +8,24 @@ Geltendmachung möglich ist und ob es sich **lohnt**.
 
 > ⚠️ **Keine Steuerberatung.** Siehe [`docs/DISCLAIMER.md`](./docs/DISCLAIMER.md).
 
+## Ausprobieren
+
+**Online veröffentlichen (öffentlicher Link, 1-Klick):**
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/MrPhenylethylamine/PlantsChemicals-MedicinalApplications-TodayPastUnityNature/tree/claude/epic-hypatia-1oSxh)
+
+**Lokal starten:**
+
+```bash
+git clone https://github.com/MrPhenylethylamine/PlantsChemicals-MedicinalApplications-TodayPastUnityNature.git
+cd PlantsChemicals-MedicinalApplications-TodayPastUnityNature
+git checkout claude/epic-hypatia-1oSxh
+npm install && npm run dev    # http://localhost:3000
+```
+
+Ausführliche Schritt-für-Schritt-Anleitung (Vercel, Netlify, Cloudflare,
+lokal): siehe [`docs/DEPLOY.md`](./docs/DEPLOY.md).
+
 ## Was das Tool kann
 
 - **Einstiegsassistent** mit Schritt-für-Schritt-Führung und Fortschrittsanzeige
