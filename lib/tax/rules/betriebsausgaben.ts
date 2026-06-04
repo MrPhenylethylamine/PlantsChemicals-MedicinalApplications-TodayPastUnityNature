@@ -1,0 +1,133 @@
+import type { TaxRule } from "@/types/tax";
+import { makeRule } from "./_helpers";
+import { SRC } from "@/lib/tax/sources";
+import * as C from "@/lib/tax/constants";
+
+/** Betriebsausgaben (Selbständigkeit, Freiberuf, Gewerbe, Nebentätigkeit). */
+export const betriebsausgabenRules: TaxRule[] = [
+  makeRule({
+    id: "ba-grundlagen",
+    title: "Betriebsausgaben (Grundprinzip)",
+    category: "betriebsausgaben",
+    subcategory: "Grundlagen",
+    legalBasis: ["§ 4 Abs. 4 EStG"],
+    officialSources: [SRC.estg4],
+    plainLanguageExplanation:
+      "Betriebsausgaben sind alle Aufwendungen, die durch den Betrieb veranlasst sind (z. B. Büromaterial, Software, Fachliteratur, Telefon, Reisekosten). Sie mindern den Gewinn und damit das zu versteuernde Einkommen.",
+    taxMechanism: "Abzug vom Betriebsgewinn (Anlage EÜR / Bilanz). Unbegrenzt, soweit betrieblich veranlasst.",
+    eligiblePersonTypes: ["selbststaendig", "freiberufler", "gewerbetreibend", "nebentaetigkeit"],
+    amountType: "unlimited_if_eligible",
+    unlimitedDeduction: true,
+    deductibilityStatus: "only_if_business_related",
+    requiredConditions: ["betriebliche Veranlassung", "Aufzeichnung/Belege"],
+    requiredEvidence: ["Rechnungen", "Belege", "EÜR-Aufzeichnungen"],
+    declarationArea: "Anlage EÜR / Anlage S oder G",
+    calculatorKey: "vollAbziehbar",
+    userQuestions: [{ id: "betrag", label: "Summe der Betriebsausgaben", type: "number", unit: "€" }],
+    commonMistakes: ["Privatanteile (Telefon, Kfz) nicht herausgerechnet.", "Bewirtung ohne ordnungsgemäßen Beleg."],
+    confidenceLevel: "verified",
+  }),
+
+  makeRule({
+    id: "ba-gwg",
+    title: "Geringwertige Wirtschaftsgüter (GWG)",
+    category: "betriebsausgaben",
+    subcategory: "Anschaffungen",
+    legalBasis: ["§ 6 Abs. 2 EStG", "§ 7 EStG"],
+    officialSources: [SRC.estg6Abs2, SRC.estg7],
+    plainLanguageExplanation:
+      "Selbständig genutzte Wirtschaftsgüter bis 800 € netto können sofort als Betriebsausgabe abgezogen werden (GWG). Teurere Güter werden über die Nutzungsdauer abgeschrieben (AfA).",
+    taxMechanism: "Sofortabzug bis 800 € netto; darüber AfA. Computer/Software: Nutzungsdauer 1 Jahr (BMF).",
+    eligiblePersonTypes: ["selbststaendig", "freiberufler", "gewerbetreibend", "nebentaetigkeit"],
+    amountType: "maximum_amount",
+    deductibilityStatus: "only_if_business_related",
+    maximumAmount: C.GWG_GRENZE_NETTO,
+    requiredEvidence: ["Rechnung", "Anlagenverzeichnis bei AfA"],
+    declarationArea: "Anlage EÜR",
+    confidenceLevel: "verified",
+  }),
+
+  makeRule({
+    id: "ba-bewirtung",
+    title: "Bewirtungskosten",
+    category: "betriebsausgaben",
+    subcategory: "Repräsentation",
+    legalBasis: ["§ 4 Abs. 5 Satz 1 Nr. 2 EStG"],
+    officialSources: [SRC.estg4Abs5],
+    plainLanguageExplanation:
+      "Geschäftlich veranlasste Bewirtungskosten sind nur zu 70 % abziehbar. Voraussetzung ist ein ordnungsgemäßer, zeitnah erstellter Bewirtungsbeleg mit Anlass und Teilnehmern.",
+    taxMechanism: "70 % abziehbar (30 % nicht abziehbar). Vorsteuer voll abziehbar.",
+    eligiblePersonTypes: ["selbststaendig", "freiberufler", "gewerbetreibend"],
+    amountType: "partial_deduction",
+    deductibilityStatus: "only_if_business_related",
+    deductibleShare: 0.7,
+    requiredConditions: ["geschäftlicher Anlass", "ordnungsgemäßer Bewirtungsbeleg (Anlass, Teilnehmer, maschinell)"],
+    requiredEvidence: ["Bewirtungsbeleg", "Restaurantrechnung (maschinell)"],
+    declarationArea: "Anlage EÜR",
+    auditRiskLevel: "high",
+    commonMistakes: ["Anlass/Teilnehmer fehlen.", "100 % statt 70 % angesetzt."],
+    confidenceLevel: "verified",
+  }),
+
+  makeRule({
+    id: "ba-kfz-fahrtenbuch",
+    title: "Kfz-Kosten / 1-%-Regelung / Fahrtenbuch",
+    category: "betriebsausgaben",
+    subcategory: "Mobilität",
+    legalBasis: ["§ 4 Abs. 5 Nr. 6 EStG", "§ 6 Abs. 1 Nr. 4 EStG"],
+    officialSources: [SRC.estg4Abs5],
+    plainLanguageExplanation:
+      "Bei betrieblichem Kfz wird der Privatanteil entweder pauschal (1-%-Regelung vom Bruttolistenpreis) oder per Fahrtenbuch ermittelt. Die Wahl beeinflusst, wie viel abziehbar bleibt.",
+    taxMechanism: "1-%-Regelung (pauschaler Privatanteil) oder Fahrtenbuch (tatsächliche Kosten anteilig).",
+    eligiblePersonTypes: ["selbststaendig", "freiberufler", "gewerbetreibend"],
+    amountType: "case_by_case",
+    deductibilityStatus: "only_if_business_related",
+    requiredConditions: ["betriebliche Nutzung > 50 % für 1-%-Regelung", "ordnungsgemäßes Fahrtenbuch (lückenlos)"],
+    requiredEvidence: ["Fahrtenbuch oder Nutzungsdokumentation", "Kostennachweise"],
+    declarationArea: "Anlage EÜR",
+    auditRiskLevel: "high",
+    confidenceLevel: "verified",
+    warningMessages: ["Ein Fahrtenbuch muss lückenlos und zeitnah geführt sein – nachträgliche Erstellung wird nicht anerkannt."],
+  }),
+
+  makeRule({
+    id: "ba-uebungsleiter",
+    title: "Übungsleiterpauschale",
+    category: "betriebsausgaben",
+    subcategory: "Ehrenamt/Nebentätigkeit",
+    legalBasis: ["§ 3 Nr. 26 EStG"],
+    officialSources: [SRC.estg4],
+    plainLanguageExplanation:
+      "Einnahmen aus bestimmten nebenberuflichen Tätigkeiten (Übungsleiter, Ausbilder, Pfleger, künstlerisch) sind bis 3.000 € pro Jahr steuerfrei. Erst darüber hinausgehende Einnahmen sind zu versteuern.",
+    taxMechanism: "Steuerfreibetrag 3.000 €/Jahr (seit 2021).",
+    eligiblePersonTypes: ["nebentaetigkeit"],
+    amountType: "lump_sum",
+    deductibilityStatus: "deductible",
+    lumpSumAmount: { 2021: C.UEBUNGSLEITERPAUSCHALE, 2022: C.UEBUNGSLEITERPAUSCHALE, 2023: C.UEBUNGSLEITERPAUSCHALE, 2024: C.UEBUNGSLEITERPAUSCHALE, 2025: C.UEBUNGSLEITERPAUSCHALE, 2026: C.UEBUNGSLEITERPAUSCHALE },
+    requiredConditions: ["nebenberufliche, begünstigte Tätigkeit für gemeinnützige/öffentliche Einrichtung"],
+    requiredEvidence: ["Nachweis der Tätigkeit/Einnahmen"],
+    declarationArea: "Anlage N / Anlage S",
+    confidenceLevel: "verified",
+  }),
+
+  makeRule({
+    id: "ba-ehrenamt",
+    title: "Ehrenamtspauschale",
+    category: "betriebsausgaben",
+    subcategory: "Ehrenamt/Nebentätigkeit",
+    legalBasis: ["§ 3 Nr. 26a EStG"],
+    officialSources: [SRC.estg4],
+    plainLanguageExplanation:
+      "Für nebenberufliche Tätigkeiten im gemeinnützigen Bereich (z. B. Vorstand, Platzwart) sind Einnahmen bis 840 € pro Jahr steuerfrei (Ehrenamtspauschale).",
+    taxMechanism: "Steuerfreibetrag 840 €/Jahr (seit 2021).",
+    eligiblePersonTypes: ["nebentaetigkeit"],
+    amountType: "lump_sum",
+    deductibilityStatus: "deductible",
+    lumpSumAmount: { 2021: C.EHRENAMTSPAUSCHALE, 2022: C.EHRENAMTSPAUSCHALE, 2023: C.EHRENAMTSPAUSCHALE, 2024: C.EHRENAMTSPAUSCHALE, 2025: C.EHRENAMTSPAUSCHALE, 2026: C.EHRENAMTSPAUSCHALE },
+    requiredConditions: ["nebenberuflich", "gemeinnütziger/öffentlicher Bereich"],
+    exclusionCriteria: ["gleichzeitige Übungsleiterpauschale für dieselbe Tätigkeit"],
+    requiredEvidence: ["Nachweis der Tätigkeit"],
+    declarationArea: "Anlage N / Anlage S",
+    confidenceLevel: "verified",
+  }),
+];
